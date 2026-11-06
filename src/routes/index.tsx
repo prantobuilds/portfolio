@@ -86,7 +86,7 @@ function Index() {
         : window.matchMedia("(prefers-color-scheme: dark)").matches
           ? "dark"
           : "light";
-    document.documentElement.dataset.theme = initialTheme;
+    document.documentElement.dataset["theme"] = initialTheme;
     setTheme(initialTheme);
   }, []);
 
@@ -95,7 +95,7 @@ function Index() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const viewTransition = document.startViewTransition;
     const applyTheme = () => {
-      document.documentElement.dataset.theme = nextTheme;
+      document.documentElement.dataset["theme"] = nextTheme;
       setTheme(nextTheme);
       try {
         window.localStorage.setItem("pran-to-theme", nextTheme);
@@ -121,13 +121,14 @@ function Index() {
     event.preventDefault();
     if (contactStatus === "sending") return;
 
-    const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
+    const accessKey = import.meta.env["VITE_WEB3FORMS_KEY"];
     if (!accessKey) {
       setContactStatus("missing-key");
       return;
     }
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     setContactStatus("sending");
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
@@ -143,18 +144,24 @@ function Index() {
       });
       const result: { success?: boolean } = await response.json();
       setContactStatus(response.ok && result.success ? "success" : "error");
-      if (response.ok && result.success) event.currentTarget.reset();
+      if (response.ok && result.success) {
+        form.reset();
+        setSelectedService("");
+      }
     } catch {
       setContactStatus("error");
     }
   };
 
-  const statusMessage = {
-    sending: portfolio.contact.sending,
-    success: portfolio.contact.success,
-    error: portfolio.contact.error,
-    "missing-key": portfolio.contact.missingKey,
-  }[contactStatus];
+  const statusMessage =
+    contactStatus === "idle"
+      ? undefined
+      : {
+          sending: portfolio.contact.sending,
+          success: portfolio.contact.success,
+          error: portfolio.contact.error,
+          "missing-key": portfolio.contact.missingKey,
+        }[contactStatus];
 
   const closeMenu = () => setMenuOpen(false);
 
