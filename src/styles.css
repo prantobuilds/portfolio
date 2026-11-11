@@ -383,7 +383,8 @@ textarea:focus-visible {
 
 .project-preview {
   display: grid;
-  min-height: 270px;
+  width: 100%;
+  min-height: 0;
   aspect-ratio: 1.55;
   place-items: center;
   overflow: hidden;
@@ -917,10 +918,6 @@ textarea:focus-visible {
 
   .projects-grid {
     row-gap: 34px;
-  }
-
-  .project-preview {
-    min-height: 220px;
   }
 
   .about-layout {
